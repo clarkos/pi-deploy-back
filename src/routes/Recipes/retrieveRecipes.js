@@ -7,9 +7,8 @@ const Op = Sequelize.Op;
 const RecipeFormater = require("../controllers/FormatRecipe");
 
 router.get("/", async function (req, res) {
-  let response;
-  //verifica si hay query, si no lo hay busca todas las recetas
   if (!req.query.name) {
+    //verifica si hay query, si no busca todas las recetas
     try {
       let dbResult = await Recipe.findAll({
         include: [{ model: Diet, through: { attributes: [] } }],
@@ -20,18 +19,22 @@ router.get("/", async function (req, res) {
         let diets = e["diets"];
         let formated = [];
         diets.map((d) => formated.push(d["name"]));
-        let obj = RecipeFormater(e.id, e.name, e.healthScore, e.image, formated);
+        let obj = RecipeFormater(
+          e.id,
+          e.name,
+          e.healthScore,
+          e.image,
+          formated
+        );
         dbFormated.push(obj);
       });
 
-      //buscando en la API
-      let apiResult = await allAPI();
-      if (apiResult === null) return res.status(404).json({ message: "key over-used" });
+      let apiResult = await allAPI(); //buscando en la API
+      if (apiResult === null)
+        return res.status(404).json({ message: "key over-used" });
 
-      //agregando recetas desde la base de datos
-      dietIndexer(apiResult);
-      //contando el total de recetas --> api+db
-      let total = dbFormated.concat(apiResult);
+      dietIndexer(apiResult); //agregando recetas desde la base de datos
+      let total = dbFormated.concat(apiResult); //contando el total de recetas --> api+db
 
       //en caso que no haya recetas con ese nombre
       if (total.length === 0)
@@ -42,13 +45,13 @@ router.get("/", async function (req, res) {
       res.json(total);
     } catch (error) {
       console.log("error in get from api");
-      res.status(404).send({error: 'Can\'t reach API resources'})
+      res.status(404).send({ error: "Can't reach API resources" });
     }
   } else {
-    let { name } = req.query; //siempre va a haber un valor por que se verifica en el front
+    let { name } = req.query; //siempre valor a buscar sera valido por que se verifica en el front
     try {
-      //buscando en DB
       let dbResult = await Recipe.findAll({
+        //buscando en DB
         where: { name: { [Op.like]: `%${name}%` } },
         include: [
           { model: Diet, attributes: ["name"], through: { attributes: [] } },
@@ -60,22 +63,24 @@ router.get("/", async function (req, res) {
         let diets = e["diets"];
         let formated = [];
         diets.map((d) => formated.push(d["name"]));
-        let obj = RecipeFormater(e.id, e.name, e.healthScore, e.image, formated);
+        let obj = RecipeFormater(
+          e.id,
+          e.name,
+          e.healthScore,
+          e.image,
+          formated
+        );
         dbFormated.push(obj);
       });
 
-      //buscando en la API
-      let apiResult = await recipeName(name);
+      let apiResult = await recipeName(name); //buscando en la API
       if (apiResult == null) return res.json({ message: "key over-used" });
 
-      //agregando recetas desde la base de datos
-      dietIndexer(apiResult);
+      dietIndexer(apiResult); //agregando recetas desde la base de datos
+      let total = dbFormated.concat(apiResult); //contando el total de recetas --> api+db
 
-      //contando el total de recetas --> api+db
-      let total = dbFormated.concat(apiResult);
-
-      //en caso que no haya recetas con ese nombre
       if (total.length === 0)
+        //en caso que no haya recetas con ese nombre
         res.json({
           message: "Can't find nothing... Are you sure it' well written?",
         });
@@ -96,8 +101,8 @@ router.get("/:id/", async function (req, res) {
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i
       )
     ) {
-      //busqueda en la base de datos
       let dbResult = await Recipe.findOne({
+        //busqueda en la base de datos
         where: { id: id },
         include: [
           { model: Diet, attributes: ["name"], through: { attributes: [] } },
@@ -105,8 +110,8 @@ router.get("/:id/", async function (req, res) {
       });
       if (dbResult === null)
         return res.json({
-          message: "Can't find nothing... The ID is correct?",
-        }); //envia mensaje si no encuentra resultados
+          message: "Can't find nothing... The ID is correct?", //envia mensaje si no encuentra resultados
+        });
 
       let formated = [];
       dbResult.diets.map((e) => formated.push(e["name"]));
