@@ -20,13 +20,13 @@ router.get("/", async function (req, res) {
         let diets = e["diets"];
         let formated = [];
         diets.map((d) => formated.push(d["name"]));
-        let obj = RecipeFormater(e.id, e.name, e.score, e.image, formated);
+        let obj = RecipeFormater(e.id, e.name, e.healthScore, e.image, formated);
         dbFormated.push(obj);
       });
 
       //buscando en la API
       let apiResult = await allAPI();
-      if (apiResult == null) return res.json({ message: "key over-used" });
+      if (apiResult === null) return res.status(404).json({ message: "key over-used" });
 
       //agregando recetas desde la base de datos
       dietIndexer(apiResult);
@@ -42,6 +42,7 @@ router.get("/", async function (req, res) {
       res.json(total);
     } catch (error) {
       console.log("error in get from api");
+      res.status(404).send({error: 'Can\'t reach API resources'})
     }
   } else {
     let { name } = req.query; //siempre va a haber un valor por que se verifica en el front
@@ -59,7 +60,7 @@ router.get("/", async function (req, res) {
         let diets = e["diets"];
         let formated = [];
         diets.map((d) => formated.push(d["name"]));
-        let obj = RecipeFormater(e.id, e.name, e.score, e.image, formated);
+        let obj = RecipeFormater(e.id, e.name, e.healthScore, e.image, formated);
         dbFormated.push(obj);
       });
 

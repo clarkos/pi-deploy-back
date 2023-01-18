@@ -1,9 +1,9 @@
-const RecipeFormater = function (id, name, score, image, diets) {
+const RecipeFormater = function (id, name, healthScore, image, diets) {
   let obj = {
     id: id,
     name: name,
     image: image,
-    score: score,
+    healthScore: healthScore,
     diets: diets,
   };
 
