@@ -48,7 +48,7 @@ async function recipeName(name) {
       return callNameResp;
     }
   } catch (error) {
-    console.log("Something goes wrong when calling with name param");
+    res.send("Something goes wrong when calling with name param");
     console.log(error.message);
   }
 }

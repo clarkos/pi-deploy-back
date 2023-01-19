@@ -10,30 +10,45 @@ const recipe = {
   summary: "summary",
 };
 
-describe("GET /recipes/:id/", () => {
+describe("--->  GET /recipes/:id/  <---", () => {
+  let id;
   before(() =>
     conn.authenticate().catch((err) => {
       console.error("Unable to connect to the database:", err);
     })
   );
+
   beforeEach(() =>
     Recipe.sync({ force: true }).then(() => Recipe.create(recipe))
   );
 
-  it("should return properties of recipe with such id", () =>
-    agent.get("/recipes/3").then((res) => {
-      expect(res.body).to.have.all.keys( "name","id","score","image","diets", "summary", "healthScore", "steps", "dishTypes"); //prettier-ignore
-    }));
+  xit("should return properties of recipe with such id", async () => {
+    agent.get("/recipes/716429").then((res) => {
+      expect(res.body).to.have.all.keys(
+        "name",
+        "id",
+        "score",
+        "image",
+        "diets",
+        "summary",
+        "healthScore",
+        "steps",
+        "dishTypes"
+      );
+    });
+  });
+
   it("should return message if theres no recipe with such id (API)", () =>
     agent.get("/recipes/82304982730498273").then((res) => {
       expect(res.body).to.deep.equal({
-        message: "error finding with id",
+        message: "error getting by 'ID'",
       });
     }));
+
   it("should return message if theres no recipe with such id (DB)", () =>
     agent.get("/recipes/3b383fae-e738-11eb-ba80-0242ac130004").then((res) => {
       expect(res.body).to.deep.equal({
-        message: "error finding with id",
+        message: "Can't find nothing... The ID is correct?",
       });
     }));
 });

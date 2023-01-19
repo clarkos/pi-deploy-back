@@ -38,11 +38,11 @@ router.get("/", async function (req, res) {
 
       //en caso que no haya recetas con ese nombre
       if (total.length === 0)
-        res.json({
+        res.status(400).json({
           message:
             "Can't find nothing... there are some problem with the API connection",
         });
-      res.json(total);
+      res.status(200).json(total);
     } catch (error) {
       console.log("error in get from api");
       res.status(404).send({ error: "Can't reach API resources" });
@@ -84,10 +84,10 @@ router.get("/", async function (req, res) {
         res.json({
           message: "Can't find nothing... Are you sure it' well written?",
         });
-
-      res.json(total);
+      res.status(200).json(total);
     } catch (error) {
       console.log("error getting by 'recipe name'");
+      res.status(402).send({error: error.message});
     }
   }
 });
@@ -138,6 +138,7 @@ router.get("/:id/", async function (req, res) {
     }
   } catch (error) {
     console.log("error looking for ID", error.message);
+    res.status(402).send({error: error.message});
   }
 });
 

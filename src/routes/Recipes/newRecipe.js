@@ -26,8 +26,11 @@ router.post("/", async (req, res) => {
       image: "https://i.stack.imgur.com/ZupHq.gif",
     });
 
-    let formated = Array.isArray(diets) ? diets : [diets];
 
+    //   Asignacion de dietas
+
+    let formated = Array.isArray(diets) ? diets : [diets]; // verifico que el vavlor sea un array
+    // verifico que existan en la tabla de dietas y las selecciono
     const matchingDiets = await Diet.findAll({
       where: {
         name: {
@@ -36,10 +39,10 @@ router.post("/", async (req, res) => {
       },
     });
 
+    // asigno al objeto que estoy guardando las dietas que seleccione
     await newRecipe.setDiets(matchingDiets);
-    res.status(201).json(newRecipe);
+    res.status(201).json(newRecipe); // devuelvo la respuesta
   } catch (error) {
-    // console.log("Failed at POST", error);
     res.status(400).send("Failed at POST ", error.message)
   }
 });

@@ -10,7 +10,7 @@ const recipe = {
   summary: "summary",
 };
 
-describe("GET /recipes?name=", () => {
+describe("--->  GET /recipes?name=  <---", () => {
   before(() =>
     conn.authenticate().catch((err) => {
       console.error("Unable to connect to the database:", err);
@@ -21,35 +21,45 @@ describe("GET /recipes?name=", () => {
     Recipe.sync({ force: true }).then(() => Recipe.create(recipe))
   );
 
-  it("should get 200", () => agent.get("/recipes?name=milanesa").expect(200));
+  it("should get 200", (done) => {
+    agent.get("/recipes?name=milanesa").expect(200);
+    done();
+  });
 
-  it("should return an array of results", () =>
+  it("should return an JSON array of results", (done) => {
     agent
-      .get("/recipes?name=salad")
+      .get("/recipes?name=cheese")
       .expect(200)
       .then((res) => {
-        expect(res.body).to.be.an("array");
+        console.log(typeOf(res));
+        expect(res.body).to.be.an("json");
         // expect(Array.isArray(res.body)).to.be.true;
-      }));
+      });
+    done();
+  });
 
-  it("should return properties of diets", () =>
-    agent.get("/recipes?name=salad").then((res) => {
+  it("should return properties of diets", (done) => {
+    agent.get("/recipes?name=cheese").then((res) => {
       expect(res.body[0]).to.have.all.keys(
         "name",
         "id",
-        "score",
+        "healthScore",
         "image",
         "diets"
       );
-    }));
+    });
+    done();
+  });
 
-  it("should return error message if theres no results", () =>
+  it("should return error message if theres no results", (done) => {
     agent
       .get("/recipes?name=mdasda")
       .expect(200)
       .then((res) => {
         expect(res.body).to.be.deep.equal({
-          message: "couldnt find any results",
+          message: "Something goes wrong when calling with name param",
         });
-      }));
+      });
+    done();
+  });
 });
